@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Single Card Couple Game</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    min-height: 100vh;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(0,170,255,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(255,0,150,0.15) 0%, transparent 40%),
+      linear-gradient(135deg, #0a1a3a, #1b0f2e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Impact, Arial Black, sans-serif;
+    color: white;
+}
+
+/* ✅ CARD BLUE + PINK ONLY */
+.ticket {
+    width: 280px;
+    height: 480px;
+    background: linear-gradient(160deg, #2196f3 0%, #ff4fa3 100%);
+    border-radius: 25px;
+    box-shadow: 
+        0 30px 80px rgba(0, 150, 255, 0.35),
+        inset 0 0 40px rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* ✅ SHUFFLE ANIMATION */
+.ticket.shuffle {
+    animation: flip 0.15s infinite linear;
+}
+@keyframes flip {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(180deg); }
+}
+
+.super-text { font-size: 26px; text-transform: uppercase; }
+.discount-text { font-size: 18px; color: #ffe66d; text-transform: uppercase; }
+
+.percent {
+    font-size: 22px;
+    min-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    padding: 10px;
+}
+
+/* ✅ BUTTON */
+.food-drink {
+    font-size: 18px;
+    padding: 12px 20px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 50px;
+    border: 3px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+.food-drink:hover { transform: scale(1.05); }
+
+/* ✅ INPUT */
+.card-input {
+    background: rgba(0,0,0,0.35);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50px;
+    padding: 12px;
+    width: 90%;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+}
+.card-input::placeholder { 
+    color: #eee; 
+    text-transform: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="ticket" id="ticket">
+
+    <div>
+        <div class="super-text" id="topText">ENTER MALE NAME</div>
+        <div class="discount-text" id="subText">PLAYER SETUP</div>
+    </div>
+
+    <div class="percent" id="centerArea">
+        <input id="nameInput" class="card-input" placeholder="Type your name...">
+    </div>
+
+    <div class="food-drink" id="mainBtn" onclick="mainAction()">NEXT</div>
+
+</div>
+
+<script>
+let male = "", female = "";
+let stage = "male";
+let turn = "male";
+let mode = "setup";
+let shuffling = false;
+
+let maleIndex = 0;
+let femaleIndex = 0;
+
+let maleToFemale = [
+ "WHAT DO YOU LIKE MOST ABOUT ME?",
+ "WHAT IS YOUR FAVORITE MEMORY WITH ME?",
+ "WHAT MAKES YOU SMILE INSTANTLY?"
+];
+
+let femaleToMale = [
+ "WHAT IS YOUR BIGGEST DREAM?",
+ "WHAT IS YOUR STRENGTH?",
+ "WHAT DO YOU FEAR THE MOST?"
+];
+
+const Reapet = ["BEST MEMORIES"];
+
+let repeatUsed = 0;
+const MAX_REPEAT = 3;     
+const REPEAT_CHANCE = 0.4;  
+
+const finalQuestion = "🔥 FINAL RARE QUESTION 🔥 WHAT IS YOUR BIGGEST LIFE GOAL?";
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function mainAction() {
+    if (mode === "setup") handleNameInput();
+    else if (mode === "play") startShuffle();
+    else if (mode === "ok") nextTurn();
+    else if (mode === "restart") location.reload();
+}
+
+function handleNameInput() {
+    const input = document.getElementById("nameInput");
+    const value = input.value.trim().toUpperCase();
+    if (!value) return alert("ENTER NAME");
+
+    if (stage === "male") {
+        male = value;
+        stage = "female";
+        input.value = "";
+        document.getElementById("topText").textContent = "ENTER FEMALE NAME";
+    } 
+    else {
+        female = value;
+        input.remove();
+        shuffleArray(maleToFemale);
+        shuffleArray(femaleToMale);
+        startGame();
+    }
+}
+
+function startGame() {
+    updateTurnUI();
+}
+
+function updateTurnUI() {
+    document.getElementById("topText").textContent =
+        turn === "male" ? male + "'S TURN" : female + "'S TURN";
+
+    document.getElementById("subText").textContent =
+        turn === "male" ? "QUESTION TO " + female : "QUESTION TO " + male;
+
+    document.getElementById("centerArea").textContent = "PRESS PLAY";
+    document.getElementById("mainBtn").textContent = "PLAY";
+    mode = "play";
+}
+
+function getQuestion() {
+    if (repeatUsed < MAX_REPEAT && Math.random() < REPEAT_CHANCE) {
+        repeatUsed++;
+        document.getElementById("subText").textContent = "REPEAT QUESTION";
+        return Reapet[0];
+    }
+
+    document.getElementById("subText").textContent =
+        turn === "male" ? "QUESTION TO " + female : "QUESTION TO " + male;
+
+    if (turn === "male") {
+        if (maleIndex < maleToFemale.length) return maleToFemale[maleIndex++];
+    } 
+    else {
+        if (femaleIndex < femaleToMale.length) return femaleToMale[femaleIndex++];
+    }
+
+    return null;
+}
+
+function startShuffle() {
+    if (shuffling) return;
+    shuffling = true;
+
+    const card = document.getElementById("ticket");
+    const center = document.getElementById("centerArea");
+
+    card.classList.add("shuffle");
+    center.textContent = "SHUFFLING...";
+
+    setTimeout(() => {
+        card.classList.remove("shuffle");
+
+        const question = getQuestion();
+
+        if (!question) {
+            center.textContent = finalQuestion;
+            document.getElementById("subText").textContent = "FINAL ROUND";
+            document.getElementById("mainBtn").textContent = "RESTART";
+            mode = "restart";
+        } 
+        else {
+            center.textContent = question;
+            document.getElementById("mainBtn").textContent = "OK";
+            mode = "ok";
+        }
+
+        shuffling = false;
+    }, 1300);
+}
+
+function nextTurn() {
+    turn = turn === "male" ? "female" : "male";
+    updateTurnUI();
+}
+</script>
+
+</body>
+</html>
