@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Single Card Couple Game</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Game</title>
+<meta name="robots" content="noindex, nofollow">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -18,12 +19,15 @@ body {
     align-items: center;
     font-family: Impact, Arial Black, sans-serif;
     color: white;
+    padding: 20px;
+    overflow-x: hidden;
 }
 
 /* ✅ CARD BLUE + PINK ONLY */
 .ticket {
-    width: 280px;
-    height: 480px;
+    width: min(280px, 90vw);
+    height: min(480px, 75vh);
+    max-width: 320px;
     background: linear-gradient(160deg, #2196f3 0%, #ff4fa3 100%);
     border-radius: 25px;
     box-shadow: 
@@ -36,6 +40,21 @@ body {
     text-align: center;
 }
 
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .ticket {
+        padding: 30px 15px;
+        height: min(500px, 80vh);
+    }
+}
+
+@media (max-height: 600px) {
+    .ticket {
+        padding: 20px 15px;
+        height: 90vh;
+    }
+}
+
 /* ✅ SHUFFLE ANIMATION */
 .ticket.shuffle {
     animation: flip 0.15s infinite linear;
@@ -45,22 +64,40 @@ body {
     100% { transform: rotateY(180deg); }
 }
 
-.super-text { font-size: 26px; text-transform: uppercase; }
-.discount-text { font-size: 18px; color: #ffe66d; text-transform: uppercase; }
+.super-text { 
+    font-size: clamp(20px, 5vw, 26px); 
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+.discount-text { 
+    font-size: clamp(14px, 3.5vw, 18px); 
+    color: #ffe66d; 
+    text-transform: uppercase;
+    margin-top: 8px;
+}
 
 .percent {
-    font-size: 22px;
+    font-size: clamp(18px, 4.5vw, 22px);
     min-height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
     text-transform: uppercase;
     padding: 10px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+@media (max-height: 600px) {
+    .percent {
+        min-height: 80px;
+        font-size: clamp(16px, 4vw, 20px);
+    }
 }
 
 /* ✅ BUTTON */
 .food-drink {
-    font-size: 18px;
+    font-size: clamp(16px, 4vw, 18px);
     padding: 12px 20px;
     background: rgba(0,0,0,0.25);
     border-radius: 50px;
@@ -68,8 +105,15 @@ body {
     cursor: pointer;
     transition: 0.3s;
     text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
 }
 .food-drink:hover { transform: scale(1.05); }
+.food-drink:active { 
+    transform: scale(0.95);
+    background: rgba(0,0,0,0.4);
+}
 
 /* ✅ INPUT */
 .card-input {
@@ -80,11 +124,20 @@ body {
     width: 90%;
     text-align: center;
     color: white;
-    font-size: 16px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    -webkit-appearance: none;
+    appearance: none;
 }
 .card-input::placeholder { 
     color: #eee; 
     text-transform: none;
+}
+
+/* Prevent zoom on input focus for iOS */
+@media (max-width: 768px) {
+    .card-input {
+        font-size: 16px;
+    }
 }
 </style>
 </head>
